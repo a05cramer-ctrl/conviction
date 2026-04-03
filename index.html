@@ -277,32 +277,85 @@
     .fog-wrap {
       position: fixed;
       bottom: 0; left: 0; right: 0;
-      height: 38vh;
+      height: 52vh;
       z-index: 2;
       pointer-events: none;
       overflow: hidden;
     }
-    .fog-layer {
-      position: absolute;
-      bottom: 0;
-      width: 220%;
-      height: 100%;
-      background: radial-gradient(ellipse 60% 55% at 50% 100%,
-        rgba(255,255,255,0.055) 0%,
-        rgba(255,255,255,0.022) 45%,
-        transparent 100%);
-      border-radius: 50%;
-      will-change: transform;
-    }
-    .fog-layer:nth-child(1) { animation: fog-drift 28s ease-in-out infinite; opacity: .9; }
-    .fog-layer:nth-child(2) { animation: fog-drift 38s ease-in-out infinite reverse; opacity: .6; height: 70%; }
-    .fog-layer:nth-child(3) { animation: fog-drift 22s ease-in-out infinite 6s; opacity: .5; height: 50%; }
 
-    @keyframes fog-drift {
-      0%   { transform: translateX(-10%) scaleX(1);   }
-      33%  { transform: translateX(2%)   scaleX(1.06); }
-      66%  { transform: translateX(-6%)  scaleX(0.97); }
-      100% { transform: translateX(-10%) scaleX(1);   }
+    .smoke {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(38px);
+      will-change: transform, opacity;
+    }
+
+    /* Layer A — wide slow base, drifts left→right */
+    .smoke-a {
+      width: 90vw; height: 28vh;
+      bottom: -4vh; left: -10vw;
+      background: radial-gradient(ellipse at 50% 80%,
+        rgba(220,220,230,0.18) 0%,
+        rgba(200,200,215,0.08) 55%,
+        transparent 100%);
+      animation: drift-a 20s ease-in-out infinite;
+    }
+    .smoke-a2 {
+      width: 80vw; height: 22vh;
+      bottom: -2vh; left: 20vw;
+      background: radial-gradient(ellipse at 50% 80%,
+        rgba(210,210,225,0.14) 0%,
+        rgba(190,190,210,0.06) 55%,
+        transparent 100%);
+      animation: drift-a 28s ease-in-out infinite reverse;
+    }
+
+    /* Layer B — mid-height puffs drifting opposite */
+    .smoke-b {
+      width: 65vw; height: 20vh;
+      bottom: 6vh; left: -5vw;
+      background: radial-gradient(ellipse at 50% 70%,
+        rgba(230,230,240,0.13) 0%,
+        rgba(200,210,220,0.05) 60%,
+        transparent 100%);
+      animation: drift-b 16s ease-in-out infinite;
+    }
+    .smoke-b2 {
+      width: 55vw; height: 18vh;
+      bottom: 8vh; right: -5vw;
+      background: radial-gradient(ellipse at 50% 70%,
+        rgba(225,225,238,0.12) 0%,
+        rgba(200,205,218,0.05) 60%,
+        transparent 100%);
+      animation: drift-b 22s ease-in-out infinite 4s reverse;
+    }
+
+    /* Layer C — thin wisps near the very bottom */
+    .smoke-c {
+      width: 100vw; height: 14vh;
+      bottom: 0; left: 0;
+      background: linear-gradient(to top,
+        rgba(240,240,248,0.16) 0%,
+        rgba(230,230,245,0.07) 50%,
+        transparent 100%);
+      animation: drift-c 12s ease-in-out infinite;
+    }
+
+    @keyframes drift-a {
+      0%   { transform: translateX(0)    scaleY(1);    opacity: 1;   }
+      40%  { transform: translateX(6vw)  scaleY(1.08); opacity: .85; }
+      70%  { transform: translateX(12vw) scaleY(0.96); opacity: .95; }
+      100% { transform: translateX(0)    scaleY(1);    opacity: 1;   }
+    }
+    @keyframes drift-b {
+      0%   { transform: translateX(0)     scaleX(1);    opacity: 1;   }
+      50%  { transform: translateX(-8vw)  scaleX(1.1);  opacity: .8;  }
+      100% { transform: translateX(0)     scaleX(1);    opacity: 1;   }
+    }
+    @keyframes drift-c {
+      0%   { transform: translateX(0);   opacity: .9; }
+      50%  { transform: translateX(4vw); opacity: .7; }
+      100% { transform: translateX(0);   opacity: .9; }
     }
 
     /* ── LIGHTNING ── */
@@ -332,11 +385,13 @@
 <!-- RAIN -->
 <canvas id="rain"></canvas>
 
-<!-- FOG -->
+<!-- FOG / SMOKE -->
 <div class="fog-wrap">
-  <div class="fog-layer"></div>
-  <div class="fog-layer"></div>
-  <div class="fog-layer"></div>
+  <div class="smoke smoke-c"></div>
+  <div class="smoke smoke-a"></div>
+  <div class="smoke smoke-a2"></div>
+  <div class="smoke smoke-b"></div>
+  <div class="smoke smoke-b2"></div>
 </div>
 
 <!-- LIGHTNING -->
@@ -394,9 +449,8 @@
   (function () {
     const canvas = document.getElementById('rain');
     const ctx    = canvas.getContext('2d');
-    const DROPS  = 120;
-    let drops    = [];
-    let W, H;
+    const DROPS  = 200;
+    let drops = [], W, H;
 
     function resize() {
       W = canvas.width  = window.innerWidth;
@@ -406,37 +460,36 @@
     function mkDrop() {
       return {
         x:     Math.random() * W,
-        y:     Math.random() * H - H,
-        len:   Math.random() * 14 + 8,
-        speed: Math.random() * 3.5 + 2.5,
-        op:    Math.random() * 0.13 + 0.04,
-        thick: Math.random() * 0.6 + 0.3,
+        y:     Math.random() * H,
+        len:   Math.random() * 22 + 14,
+        speed: Math.random() * 4 + 3,
+        op:    Math.random() * 0.25 + 0.15,
+        thick: Math.random() * 0.8 + 0.5,
       };
     }
 
-    function init() {
-      resize();
-      drops = Array.from({ length: DROPS }, mkDrop);
-    }
+    function init() { resize(); drops = Array.from({ length: DROPS }, mkDrop); }
 
     function draw() {
       ctx.clearRect(0, 0, W, H);
       for (const d of drops) {
+        const dx = d.len * 0.22;
         ctx.beginPath();
         ctx.moveTo(d.x, d.y);
-        ctx.lineTo(d.x + d.len * 0.28, d.y + d.len);
-        ctx.strokeStyle = `rgba(160,160,175,${d.op})`;
+        ctx.lineTo(d.x + dx, d.y + d.len);
+        ctx.strokeStyle = `rgba(180,185,200,${d.op})`;
         ctx.lineWidth   = d.thick;
         ctx.stroke();
 
-        d.x += d.speed * 0.28;
+        d.x += d.speed * 0.22;
         d.y += d.speed;
 
-        if (d.y > H + 20) {
-          d.x     = Math.random() * W;
-          d.y     = -20;
-          d.speed = Math.random() * 3.5 + 2.5;
-          d.op    = Math.random() * 0.13 + 0.04;
+        if (d.y > H + 30) {
+          d.x     = Math.random() * (W + 60) - 30;
+          d.y     = -30;
+          d.len   = Math.random() * 22 + 14;
+          d.speed = Math.random() * 4 + 3;
+          d.op    = Math.random() * 0.25 + 0.15;
         }
       }
       requestAnimationFrame(draw);
