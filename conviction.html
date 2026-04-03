@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>$CONVICTION</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold:        #C9A84C;
+      --gold-light:  #e8c96a;
+      --gold-dim:    rgba(201,168,76,0.18);
+      --white:       #ffffff;
+      --dark:        rgba(0,0,0,0.55);
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+    }
+
+    /* ── BACKGROUND ── */
+    body {
+      font-family: 'Inter', sans-serif;
+      color: var(--white);
+      background: #000;
+      position: relative;
+    }
+
+    .bg {
+      position: fixed;
+      inset: 0;
+      background: url('bg.png') center center / cover no-repeat;
+      z-index: 0;
+    }
+    .bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.62) 0%,
+        rgba(0,0,0,0.48) 40%,
+        rgba(0,0,0,0.70) 100%
+      );
+    }
+
+    /* ── LAYOUT ── */
+    .page {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── NAV ── */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 40px;
+      flex-shrink: 0;
+    }
+
+    .nav-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 3px;
+      color: var(--gold);
+      text-shadow: 0 0 18px rgba(201,168,76,0.5);
+    }
+
+    .btn-buy-nav {
+      font-family: 'Inter', sans-serif;
+      font-size: .8rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--white);
+      background: transparent;
+      border: 1.5px solid var(--gold);
+      padding: 9px 22px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background .2s, color .2s, box-shadow .2s;
+      text-decoration: none;
+    }
+    .btn-buy-nav:hover {
+      background: var(--gold);
+      color: #000;
+      box-shadow: 0 0 20px rgba(201,168,76,0.45);
+    }
+
+    /* ── HERO ── */
+    .hero {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 0 24px;
+      gap: 0;
+    }
+
+    .hero-ticker {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(5rem, 14vw, 11rem);
+      line-height: 1;
+      letter-spacing: 6px;
+      color: var(--white);
+      text-shadow:
+        0 0 30px rgba(201,168,76,0.55),
+        0 0 80px rgba(201,168,76,0.25),
+        0 2px 12px rgba(0,0,0,0.8);
+      animation: glow 3.5s ease-in-out infinite;
+    }
+
+    @keyframes glow {
+      0%, 100% {
+        text-shadow:
+          0 0 30px rgba(201,168,76,0.55),
+          0 0 80px rgba(201,168,76,0.25),
+          0 2px 12px rgba(0,0,0,0.8);
+      }
+      50% {
+        text-shadow:
+          0 0 50px rgba(201,168,76,0.8),
+          0 0 120px rgba(201,168,76,0.4),
+          0 2px 12px rgba(0,0,0,0.8);
+      }
+    }
+
+    .hero-tagline {
+      font-family: 'Inter', sans-serif;
+      font-size: clamp(.95rem, 2.2vw, 1.25rem);
+      font-weight: 400;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.82);
+      margin-top: 14px;
+      text-transform: uppercase;
+    }
+
+    /* ── CTA BUTTONS ── */
+    .cta-group {
+      display: flex;
+      gap: 16px;
+      margin-top: 38px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn-cta {
+      font-family: 'Inter', sans-serif;
+      font-size: .88rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--white);
+      background: rgba(0,0,0,0.55);
+      border: 1.5px solid var(--gold);
+      padding: 14px 34px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background .2s, box-shadow .2s, transform .15s;
+      backdrop-filter: blur(4px);
+    }
+    .btn-cta:hover {
+      background: var(--gold);
+      color: #000;
+      box-shadow: 0 0 28px rgba(201,168,76,0.55);
+      transform: translateY(-2px);
+    }
+    .btn-cta:active { transform: translateY(0); }
+
+    .btn-cta.secondary {
+      border-color: rgba(255,255,255,0.4);
+    }
+    .btn-cta.secondary:hover {
+      background: rgba(255,255,255,0.12);
+      color: var(--white);
+      border-color: rgba(255,255,255,0.8);
+      box-shadow: 0 0 20px rgba(255,255,255,0.12);
+    }
+
+    /* ── CONTRACT ADDRESS ── */
+    .ca-bar {
+      flex-shrink: 0;
+      display: flex;
+      justify-content: center;
+      padding: 20px 24px 28px;
+    }
+
+    .ca-inner {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(0,0,0,0.5);
+      border: 1px solid rgba(201,168,76,0.35);
+      border-radius: 50px;
+      padding: 11px 22px;
+      backdrop-filter: blur(6px);
+      cursor: pointer;
+      transition: border-color .2s, box-shadow .2s;
+      max-width: 100%;
+    }
+    .ca-inner:hover {
+      border-color: var(--gold);
+      box-shadow: 0 0 16px rgba(201,168,76,0.25);
+    }
+
+    .ca-label {
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--gold);
+      white-space: nowrap;
+    }
+
+    .ca-address {
+      font-size: .8rem;
+      color: rgba(255,255,255,0.7);
+      letter-spacing: .5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 340px;
+    }
+
+    .ca-copy-icon {
+      font-size: .8rem;
+      color: rgba(255,255,255,0.4);
+      flex-shrink: 0;
+      transition: color .2s;
+    }
+    .ca-inner:hover .ca-copy-icon { color: var(--gold); }
+
+    .ca-toast {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      background: var(--gold);
+      color: #000;
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 8px 20px;
+      border-radius: 99px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s, transform .2s;
+      white-space: nowrap;
+    }
+    .ca-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ── MOBILE ── */
+    @media (max-width: 500px) {
+      nav { padding: 16px 20px; }
+      .hero-ticker { letter-spacing: 2px; }
+      .btn-cta { padding: 12px 24px; font-size: .8rem; }
+      .ca-address { max-width: 180px; font-size: .72rem; }
+      .ca-inner { padding: 9px 16px; gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg"></div>
+
+<div class="page">
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">$CONVICTION</div>
+    <a href="#" class="btn-buy-nav">Buy Now</a>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-ticker">CONVICTION</div>
+    <div class="hero-tagline">When everyone sells. You hold.</div>
+    <div class="cta-group">
+      <a href="#" class="btn-cta">Buy $CONVICTION</a>
+      <a href="https://twitter.com" target="_blank" class="btn-cta secondary">Twitter</a>
+    </div>
+  </div>
+
+  <!-- CONTRACT ADDRESS -->
+  <div class="ca-bar">
+    <div class="ca-inner" onclick="copyCA()">
+      <span class="ca-label">CA</span>
+      <span class="ca-address" id="caText">PASTE_CONTRACT_ADDRESS_HERE</span>
+      <span class="ca-copy-icon">⧉</span>
+    </div>
+  </div>
+
+</div>
+
+<div class="ca-toast" id="toast">Copied to clipboard</div>
+
+<script>
+  function copyCA() {
+    const addr = document.getElementById('caText').textContent.trim();
+    navigator.clipboard.writeText(addr).catch(() => {
+      const el = document.createElement('textarea');
+      el.value = addr;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+    });
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
+  }
+</script>
+
+</body>
+</html>
