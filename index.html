@@ -52,7 +52,7 @@
     /* ── LAYOUT ── */
     .page {
       position: relative;
-      z-index: 1;
+      z-index: 4;
       width: 100%;
       height: 100vh;
       display: flex;
@@ -265,6 +265,56 @@
       transform: translateX(-50%) translateY(0);
     }
 
+    /* ── RAIN CANVAS ── */
+    #rain {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* ── FOG ── */
+    .fog-wrap {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 38vh;
+      z-index: 2;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .fog-layer {
+      position: absolute;
+      bottom: 0;
+      width: 220%;
+      height: 100%;
+      background: radial-gradient(ellipse 60% 55% at 50% 100%,
+        rgba(255,255,255,0.055) 0%,
+        rgba(255,255,255,0.022) 45%,
+        transparent 100%);
+      border-radius: 50%;
+      will-change: transform;
+    }
+    .fog-layer:nth-child(1) { animation: fog-drift 28s ease-in-out infinite; opacity: .9; }
+    .fog-layer:nth-child(2) { animation: fog-drift 38s ease-in-out infinite reverse; opacity: .6; height: 70%; }
+    .fog-layer:nth-child(3) { animation: fog-drift 22s ease-in-out infinite 6s; opacity: .5; height: 50%; }
+
+    @keyframes fog-drift {
+      0%   { transform: translateX(-10%) scaleX(1);   }
+      33%  { transform: translateX(2%)   scaleX(1.06); }
+      66%  { transform: translateX(-6%)  scaleX(0.97); }
+      100% { transform: translateX(-10%) scaleX(1);   }
+    }
+
+    /* ── LIGHTNING ── */
+    #lightning {
+      position: fixed;
+      inset: 0;
+      z-index: 3;
+      background: #fff;
+      opacity: 0;
+      pointer-events: none;
+    }
+
     /* ── MOBILE ── */
     @media (max-width: 500px) {
       nav { padding: 16px 20px; }
@@ -278,6 +328,19 @@
 <body>
 
 <div class="bg"></div>
+
+<!-- RAIN -->
+<canvas id="rain"></canvas>
+
+<!-- FOG -->
+<div class="fog-wrap">
+  <div class="fog-layer"></div>
+  <div class="fog-layer"></div>
+  <div class="fog-layer"></div>
+</div>
+
+<!-- LIGHTNING -->
+<div id="lightning"></div>
 
 <div class="page">
 
@@ -311,6 +374,7 @@
 <div class="ca-toast" id="toast">Copied to clipboard</div>
 
 <script>
+  /* ── COPY CA ── */
   function copyCA() {
     const addr = document.getElementById('caText').textContent.trim();
     navigator.clipboard.writeText(addr).catch(() => {
@@ -325,6 +389,83 @@
     toast.classList.add('show');
     setTimeout(() => toast.classList.remove('show'), 2000);
   }
+
+  /* ── RAIN ── */
+  (function () {
+    const canvas = document.getElementById('rain');
+    const ctx    = canvas.getContext('2d');
+    const DROPS  = 120;
+    let drops    = [];
+    let W, H;
+
+    function resize() {
+      W = canvas.width  = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+    }
+
+    function mkDrop() {
+      return {
+        x:     Math.random() * W,
+        y:     Math.random() * H - H,
+        len:   Math.random() * 14 + 8,
+        speed: Math.random() * 3.5 + 2.5,
+        op:    Math.random() * 0.13 + 0.04,
+        thick: Math.random() * 0.6 + 0.3,
+      };
+    }
+
+    function init() {
+      resize();
+      drops = Array.from({ length: DROPS }, mkDrop);
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      for (const d of drops) {
+        ctx.beginPath();
+        ctx.moveTo(d.x, d.y);
+        ctx.lineTo(d.x + d.len * 0.28, d.y + d.len);
+        ctx.strokeStyle = `rgba(160,160,175,${d.op})`;
+        ctx.lineWidth   = d.thick;
+        ctx.stroke();
+
+        d.x += d.speed * 0.28;
+        d.y += d.speed;
+
+        if (d.y > H + 20) {
+          d.x     = Math.random() * W;
+          d.y     = -20;
+          d.speed = Math.random() * 3.5 + 2.5;
+          d.op    = Math.random() * 0.13 + 0.04;
+        }
+      }
+      requestAnimationFrame(draw);
+    }
+
+    window.addEventListener('resize', () => { resize(); drops = Array.from({ length: DROPS }, mkDrop); });
+    init();
+    draw();
+  })();
+
+  /* ── LIGHTNING ── */
+  (function () {
+    const el = document.getElementById('lightning');
+
+    function flash() {
+      const delay = 10000 + Math.random() * 5000;
+      setTimeout(() => {
+        el.style.transition = 'none';
+        el.style.opacity    = '0.06';
+        setTimeout(() => {
+          el.style.transition = 'opacity 80ms ease-out';
+          el.style.opacity    = '0';
+          flash();
+        }, 100);
+      }, delay);
+    }
+
+    flash();
+  })();
 </script>
 
 </body>
